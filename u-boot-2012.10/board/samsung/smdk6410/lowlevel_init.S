@@ -275,7 +275,7 @@ nand_asm_init:
 	str	r1, [r0, #NFCONF_OFFSET]
 
 	ldr	r1, [r0, #NFCONT_OFFSET]
-	orr	r1, r1, #0x07
+	orr	r1, r1, #0x03
 	str	r1, [r0, #NFCONT_OFFSET]
 
 	mov	pc, lr

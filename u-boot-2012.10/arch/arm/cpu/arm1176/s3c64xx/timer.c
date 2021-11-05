@@ -40,7 +40,9 @@
 
 #include <common.h>
 #include <asm/proc-armv/ptrace.h>
+
 #include <asm/arch/s3c6410.h>
+
 #include <div64.h>
 
 //static ulong timer_load_val;
@@ -174,3 +176,4 @@ void __udelay(unsigned long usec)
 	while (get_ticks() < tmp)/* loop till event */
 		 /*NOP*/;
 }
+

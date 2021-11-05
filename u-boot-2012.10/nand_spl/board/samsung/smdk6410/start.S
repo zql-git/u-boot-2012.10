@@ -1,1 +1,0 @@
-/home/wenson/ok6410/u-boot-2012.10/arch/arm/cpu/arm1176/start.S

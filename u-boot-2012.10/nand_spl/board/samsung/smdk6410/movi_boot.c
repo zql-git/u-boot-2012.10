@@ -1,1 +1,0 @@
-/home/wenson/ok6410/u-boot-2012.10/nand_spl/movi_boot.c

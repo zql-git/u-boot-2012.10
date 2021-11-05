@@ -249,15 +249,15 @@
 #define CONFIG_SYS_NAND_U_BOOT_DST	CONFIG_SYS_PHY_UBOOT_BASE	/* NUB load-addr      */
 #define CONFIG_SYS_NAND_U_BOOT_START	CONFIG_SYS_NAND_U_BOOT_DST	/* NUB start-addr     */
 
-#define CONFIG_SYS_NAND_U_BOOT_OFFS	(8 * 1024)	/* Offset to RAM U-Boot image */
+#define CONFIG_SYS_NAND_U_BOOT_OFFS	(16 * 1024)	/* Offset to RAM U-Boot image */
 #define CONFIG_SYS_NAND_U_BOOT_SIZE	(512 * 1024)	/* Size of RAM U-Boot image   */
 
 /* NAND chip page size		*/
 #define CONFIG_SYS_NAND_PAGE_SIZE	4096//2048
 /* NAND chip block size		*/
-#define CONFIG_SYS_NAND_BLOCK_SIZE	(512 * 1024)
+#define CONFIG_SYS_NAND_BLOCK_SIZE	(512 * 1024)  /* 一个block 512K*/
 /* NAND chip page per block count  */
-#define CONFIG_SYS_NAND_PAGE_COUNT	128//64
+#define CONFIG_SYS_NAND_PAGE_COUNT	(128)          /*每个 block 有128个 page*/
 /* Location of the bad-block label */
 #define CONFIG_SYS_NAND_BAD_BLOCK_POS	0
 /* Extra address cycle for > 128MiB */
@@ -268,23 +268,23 @@
 /* Number of ECC bytes per OOB - S3C6410 calculates 4 bytes ECC in 1-bit mode */
 #define CONFIG_SYS_NAND_ECCBYTES	13
 /* Size of a single OOB region */
-#define CONFIG_SYS_NAND_OOBSIZE		218
+#define CONFIG_SYS_NAND_OOBSIZE		224
 /* ECC byte positions */
-#define CONFIG_SYS_NAND_ECCPOS	{114,115,116,117,118,119,120,121,122,123,\
-                   124,125,126,127,128,129,130,131,132,133,\
-                   134,135,136,137,138,139,140,141,142,143,\
-                   144,145,146,147,148,149,150,151,152,153,\
-                   154,155,156,157,158,159,160,161,162,163,\
-                   164,165,166,167,168,169,170,171,172,173,\
-                   174,175,176,177,178,179,180,181,182,183,\
-                   184,185,186,187,188,189,190,191,192,193,\
-                   194,195,196,197,198,199,200,201,202,203,\
-                   204,205,206,207,208,209,210,211,212,213,\
-                   214,215,216,217}
+#define CONFIG_SYS_NAND_ECCPOS	{24,25,26,27,28,29,30,31,32,33,\
+        34,35,36,37,38,39,40,41,42,43,\
+        44,45,46,47,48,49,50,51,52,53,\
+        54,55,56,57,58,59,60,61,62,63,\
+        64,65,66,67,68,69,70,71,72,73,\
+        74,75,76,77,78,79,80,81,82,83,\
+        84,85,86,87,88,89,90,91,92,93,\
+        94,95,96,97,98,99,100,101,102,103,\
+        104,105,106,107,108,109,110,111,112,113,\
+        114,115,116,117,118,119,120,121,122,123,\
+        124,125,126,127}
 
 /* Boot configuration (define only one of next 3) */
-//#define CONFIG_BOOT_NAND
-#define CONFIG_BOOT_MOVINAND
+#define CONFIG_BOOT_NAND
+//#define CONFIG_BOOT_MOVINAND
 
 
 /* None of these are currently implemented. Left from the original Samsung

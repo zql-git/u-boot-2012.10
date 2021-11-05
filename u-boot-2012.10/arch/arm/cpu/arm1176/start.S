@@ -223,11 +223,15 @@ skip_tcmdisable:
 	 * Go setup Memory and board specific bits prior to relocation.
 	 */
 	bl	lowlevel_init		/* go setup pll,mux,memory */
+
 #ifdef CONFIG_NAND_SPL
-#ifdef CONFIG_MOVINAND
-	bl	movi_bl2_copy
+
+    #ifdef CONFIG_MOVINAND
+    	bl	movi_bl2_copy
+    #endif
+    
 #endif
-#endif
+
 /* Set stackpointer in internal RAM to call board_init_f */
 call_board_init_f:
 	ldr	sp, =(CONFIG_SYS_INIT_SP_ADDR)
@@ -265,24 +269,24 @@ stack_setup:
 copy_loop:
 	ldmia	r0!, {r9-r10}		/* copy from source address [r0]    */
 	stmia	r1!, {r9-r10}		/* copy to   target address [r1]    */
-	cmp	r0, r2			/* until source end address [r2]    */
+	cmp	r0, r2			        /* until source end address [r2]    */
 	blo	copy_loop
 
 #ifndef CONFIG_SPL_BUILD
 	/*
 	 * fix .rel.dyn relocations
 	 */
-	ldr	r0, _TEXT_BASE		/* r0 <- Text base */
-	sub	r9, r6, r0		/* r9 <- relocation offset */
+	ldr	r0, _TEXT_BASE		    /* r0 <- Text base */
+	sub	r9, r6, r0		        /* r9 <- relocation offset */
 	ldr	r10, _dynsym_start_ofs	/* r10 <- sym table ofs */
-	add	r10, r10, r0		/* r10 <- sym table in FLASH */
+	add	r10, r10, r0		    /* r10 <- sym table in FLASH */
 	ldr	r2, _rel_dyn_start_ofs	/* r2 <- rel dyn start ofs */
-	add	r2, r2, r0		/* r2 <- rel dyn start in FLASH */
+	add	r2, r2, r0		        /* r2 <- rel dyn start in FLASH */
 	ldr	r3, _rel_dyn_end_ofs	/* r3 <- rel dyn end ofs */
-	add	r3, r3, r0		/* r3 <- rel dyn end in FLASH */
+	add	r3, r3, r0		        /* r3 <- rel dyn end in FLASH */
 fixloop:
-	ldr	r0, [r2]		/* r0 <- location to fix up, IN FLASH! */
-	add	r0, r0, r9		/* r0 <- location to fix up in RAM */
+	ldr	r0, [r2]		        /* r0 <- location to fix up, IN FLASH! */
+	add	r0, r0, r9		        /* r0 <- location to fix up in RAM */
 	ldr	r1, [r2, #4]
 	and	r7, r1, #0xff
 	cmp	r7, #23			/* relative fixup? */
