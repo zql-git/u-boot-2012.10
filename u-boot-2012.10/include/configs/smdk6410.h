@@ -157,7 +157,7 @@
 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_SDRAM_BASE	/* default load address	*/
 
-#define CONFIG_SYS_HZ			1000
+#define CONFIG_SYS_HZ			1562500
 
 /**********************************
  Support Clock Settings
@@ -238,7 +238,7 @@
 
 /* NAND configuration */
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
-#define CONFIG_SYS_NAND_BASE		0x70200010
+#define CONFIG_SYS_NAND_BASE		0x70200010 
 #define CONFIG_SYS_S3C_NAND_HWECC
 
 #define CONFIG_SYS_NAND_SKIP_BAD_DOT_I	1  /* ".i" read skips bad blocks	      */
@@ -283,8 +283,10 @@
         124,125,126,127}
 
 /* Boot configuration (define only one of next 3) */
-#define CONFIG_BOOT_NAND
-//#define CONFIG_BOOT_MOVINAND
+/*----------------------------------------------------------------------------*/
+/*#define CONFIG_BOOT_NAND*/
+#define CONFIG_BOOT_MOVINAND
+/*----------------------------------------------------------------------------*/
 
 
 /* None of these are currently implemented. Left from the original Samsung

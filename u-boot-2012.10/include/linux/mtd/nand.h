@@ -57,8 +57,12 @@ extern void nand_wait_ready(struct mtd_info *mtd);
  */
 /* Select the chip by setting nCE to low */
 #define NAND_NCE		0x01
+
 /* Select the command latch by setting CLE to high */
 #define NAND_CLE		0x02
+
+
+
 /* Select the address latch by setting ALE to high */
 #define NAND_ALE		0x04
 

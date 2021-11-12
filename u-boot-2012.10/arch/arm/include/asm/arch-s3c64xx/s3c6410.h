@@ -611,7 +611,10 @@
 #define NFSECC_REG		__REG(ELFIN_NAND_BASE + NFSECC_OFFSET)
 #define NFMLCBITPT_REG		__REG(ELFIN_NAND_BASE + NFMLCBITPT_OFFSET)
 
-#define NFCONF_ECC_4BIT		(1<<24)
+
+#define NFCONF_ECC_1BIT		(0<<23)
+#define NFCONF_ECC_4BIT		(2<<23)
+#define NFCONF_ECC_8BIT		(1<<23)
 
 #define NFCONT_ECC_ENC		(1<<18)
 #define NFCONT_WP		(1<<16)
@@ -620,8 +623,8 @@
 #define NFCONT_INITMECC		(1<<5)
 #define NFCONT_INITSECC		(1<<4)
 #define NFCONT_INITECC		(NFCONT_INITMECC | NFCONT_INITSECC)
-#define NFCONT_CS_ALT		(1<<2)
-#define NFCONT_CS		(1<<1)
+#define NFCONT_CS_ALT		(1<<1)
+#define NFCONT_CS		    (1<<1)
 #define NFCONT_ENABLE		(1<<0)
 
 #define NFSTAT_ECCENCDONE	(1<<7)

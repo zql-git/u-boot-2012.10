@@ -137,10 +137,9 @@ int print_cpuinfo(void)
 	printf("**    u-boot 2012.10                  **\r\n");
 	printf("**    Updated for OK6410A Board       **\r\n");
 	printf("**    Version (2021-10-15)            **\r\n");
-	printf("**      ~(o^o)~  ~(o^o)~              **\r\n");	
 	printf("**    wenson study uboot              **\r\n");
 	printf("****************************************\r\n");
-	printf("\nCPU:     S3C6410@%luMHz\n", get_ARMCLK() / 1000000);
+	printf("\nCPU:     S3C6410@%luMHz \r\n", get_ARMCLK() / 1000000);
 	printf("         Fclk = %luMHz, Hclk = %luMHz, Pclk = %luMHz ",
 	       get_FCLK() / 1000000, get_HCLK() / 1000000,
 	       get_PCLK() / 1000000);

@@ -99,10 +99,10 @@ lowlevel_init:
 	bl uart_asm_init
 #endif
 
-#ifdef CONFIG_BOOT_NAND
+//#ifdef CONFIG_BOOT_NAND
 	/* simple init for NAND */
 	bl nand_asm_init
-#endif
+//#endif
 
 	/* Memory subsystem address 0x7e00f120 */
 	ldr	r0, =ELFIN_MEM_SYS_CFG
@@ -263,7 +263,7 @@ uart_asm_init:
 	mov	pc, lr
 #endif
 
-#ifdef CONFIG_BOOT_NAND
+//#ifdef CONFIG_BOOT_NAND
 /*
  * NAND Interface init for SMDK6410
  */
@@ -279,7 +279,7 @@ nand_asm_init:
 	str	r1, [r0, #NFCONT_OFFSET]
 
 	mov	pc, lr
-#endif
+//#endif
 
 #ifdef CONFIG_ENABLE_MMU
 /*

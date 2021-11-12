@@ -2621,6 +2621,8 @@ static const struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 	*maf_id = chip->read_byte(mtd);
 	*dev_id = chip->read_byte(mtd);
 
+     printk(KERN_INFO " maf_id = 0x%x dev_id = 0x%x",*maf_id, *dev_id);
+
 	/* Try again to make sure, as some systems the bus-hold or other
 	 * interface concerns can cause random data which looks like a
 	 * possibly credible NAND flash to appear. If the two results do
@@ -2670,9 +2672,12 @@ static const struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 	chip->chipsize = (uint64_t)type->chipsize << 20;
 
 	if (!type->pagesize && chip->init_size) {
+
+        printf(" go to here 1----\n ");
 		/* set the pagesize, oobsize, erasesize by the driver*/
 		busw = chip->init_size(mtd, chip, id_data);
 	} else if (!type->pagesize) {
+	    printf(" go to here 2----\n ");
 		int extid;
 		/* The 3rd id byte holds MLC / multichip data */
 		chip->cellinfo = id_data[2];
@@ -2732,9 +2737,20 @@ static const struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 		/*
 		 * Old devices have chip data hardcoded in the device id table
 		 */
+
+        printf(" go to here 3----\n ");
+
+        if(*maf_id==0x2c && dev_id==0x38)//MT29F8G08ABABAWP
+        {
+            mtd->oobsize = 128;
+        }
+        else
+        {
+            mtd->oobsize = mtd->writesize / 32;
+        }
+        
 		mtd->erasesize = type->erasesize;
 		mtd->writesize = type->pagesize;
-		mtd->oobsize = mtd->writesize / 32;
 		busw = type->options & NAND_BUSWIDTH_16;
 
 		/*
@@ -2750,6 +2766,11 @@ static const struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 			mtd->erasesize <<= ((id_data[3] & 0x03) << 1);
 		}
 	}
+
+#if 1 
+        printf("NandFlash:name=%s,id=%x, pagesize=%d ,chipsize=%d MB,erasesize=%d oobsize=%d\n",type->name,type->id,type->pagesize,type->chipsize,type->erasesize,mtd->oobsize);
+#endif
+    
 	/* Get chip options, preserve non chip based options */
 	chip->options |= type->options;
 
@@ -2846,17 +2867,17 @@ ident_done:
 	/* Do not replace user supplied command function ! */
 	if (mtd->writesize > 512 && chip->cmdfunc == nand_command)
 		chip->cmdfunc = nand_command_lp;
-
+#if 0
 	/* TODO onfi flash name */
-	MTDDEBUG (MTD_DEBUG_LEVEL0, "NAND device: Manufacturer ID:"
-		" 0x%02x, Chip ID: 0x%02x (%s %s)\n", *maf_id, *dev_id,
+	printk (KERN_INFO, "NAND device: Manufacturer ID:"\
+		" 0x%02x, Chip ID: 0x%02x (%s %s)\n", *maf_id, *dev_id,\
 		nand_manuf_ids[maf_idx].name,
 #ifdef CONFIG_SYS_NAND_ONFI_DETECTION
 		chip->onfi_version ? chip->onfi_params.model : type->name);
 #else
 		type->name);
 #endif
-
+#endif
 	return type;
 }
 

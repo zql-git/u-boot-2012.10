@@ -45,68 +45,57 @@
 
 #include <div64.h>
 
-//static ulong timer_load_val;
 DECLARE_GLOBAL_DATA_PTR;
 
-#define PRESCALER	167
+#define PRESCALER    167
+
+
+static ulong timestamp;
+static ulong lastdec;
+int timer_load_val = 0;
+
 
 static s3c64xx_timers *s3c64xx_get_base_timers(void)
 {
-	return (s3c64xx_timers *)ELFIN_TIMER_BASE;
+    return (s3c64xx_timers *)ELFIN_TIMER_BASE;
 }
 
 /* macro to read the 16 bit timer */
 static inline ulong read_timer(void)
 {
-	s3c64xx_timers *const timers = s3c64xx_get_base_timers();
+    s3c64xx_timers *const timers = s3c64xx_get_base_timers();
 
-	return timers->TCNTO4;
+    return timers->TCNTO4;
 }
 
-/* Internal tick units */
-/* Last decremneter snapshot */
-//static unsigned long lastdec;
-/* Monotonic incrementing timer */
-//static unsigned long long timestamp;
 
-int timer_init(void)
+int timer_init(void) 
 {
 	s3c64xx_timers *const timers = s3c64xx_get_base_timers();
 
 	/* use PWM Timer 4 because it has no output */
-	/*
-	 * We use the following scheme for the timer:
-	 * Prescaler is hard fixed at 167, divider at 1/4.
-	 * This gives at PCLK frequency 66MHz approx. 10us ticks
-	 * The timer is set to wrap after 100s, at 66MHz this obviously
-	 * happens after 10,000,000 ticks. A long variable can thus
-	 * keep values up to 40,000s, i.e., 11 hours. This should be
-	 * enough for most uses:-) Possible optimizations: select a
-	 * binary-friendly frequency, e.g., 1ms / 128. Also calculate
-	 * the prescaler automatically for other PCLK frequencies.
-	 */
-	timers->TCFG0 = PRESCALER << 8;
-//	if (timer_load_val == 0) {
-//		timer_load_val = get_PCLK() / PRESCALER * (100 / 4); /* 100s */
-//		timers->TCFG1 = (timers->TCFG1 & ~0xf0000) | 0x20000;
-//	}
-	gd->timer_rate_hz = get_PCLK() / PRESCALER * (100 / 4); /* 100s */
-	timers->TCFG1 = (timers->TCFG1 & ~0xf0000) | 0x20000;
-	/* load value for 10 ms timeout */
-//	lastdec = timers->TCNTB4 = timer_load_val;
-	gd->lastinc = timers->TCNTB4 = gd->timer_rate_hz;
-	/* auto load, manual update of Timer 4 */
-	timers->TCON = (timers->TCON & ~0x00700000) | TCON_4_AUTO |
-		TCON_4_UPDATE;
+	/* prescaler for Timer 4 is 16 */
+	timers->TCFG0 = 0x0f00;
+	if (timer_load_val == 0) {
+		/*
+		 * for 10 ms clock period @ PCLK with 4 bit divider = 1/2
+		 * (default) and prescaler = 16. Should be 10390
+		 * @33.25MHz and 15625 @ 50 MHz
+		 */
+		timer_load_val = get_PCLK() / (2 * 16 * 100);
+	}
 
+	/* load value for 10 ms timeout */
+	lastdec = timers->TCNTB4 = timer_load_val;
+	/* auto load, manual update of Timer 4 */
+	timers->TCON = (timers->TCON & ~0x00700000) | TCON_4_AUTO | TCON_4_UPDATE;
 	/* auto load, start Timer 4 */
 	timers->TCON = (timers->TCON & ~0x00700000) | TCON_4_AUTO | COUNT_4_ON;
-//	timestamp = 0;
-	gd->timer_reset_value = 0;
+	timestamp = 0;
 
-	return 0;
+	return (0);
 }
-
+ 
 /*
  * timer without interrupts
  */
@@ -117,28 +106,7 @@ int timer_init(void)
  */
 unsigned long long get_ticks(void)
 {
-	ulong now = read_timer();
-
-//	if (lastdec >= now) {
-		/* normal mode */
-//		timestamp += lastdec - now;
-//	} else {
-		/* we have an overflow ... */
-//		timestamp += lastdec + timer_load_val - now;
-//	}
-//	lastdec = now;
-
-//	return timestamp;
-	if(gd->lastinc >= now) {
-		/* normal mode */
-		gd->timer_reset_value += gd->lastinc-now;
-	} else {
-		/* we have an overflow ... */
-		gd->timer_reset_value += gd->lastinc + gd->timer_rate_hz - now;
-	}
-	gd->lastinc = now;
-
-	return gd->timer_reset_value;
+    get_timer(0);
 }
 
 /*
@@ -147,33 +115,59 @@ unsigned long long get_ticks(void)
  */
 ulong get_tbclk(void)
 {
-	/* We overrun in 100s */
-//	return (ulong)(timer_load_val / 100);
-	return (ulong)(gd->timer_rate_hz / 100);
+    /* We overrun in 100s */
+     return (ulong)(timer_load_val * 100);
+}
+void reset_timer_masked(void)
+{
+	/* reset time */
+	lastdec = read_timer();
+	timestamp = 0;
 }
 
 ulong get_timer_masked(void)
 {
-	unsigned long long res = get_ticks();
-//	do_div (res, (timer_load_val / (100 * CONFIG_SYS_HZ)));
-	do_div (res, (gd->timer_rate_hz / (100 * CONFIG_SYS_HZ)));
-	return res;
+    ulong now = read_timer();
+
+	if (lastdec >= now) {
+		/* normal mode */
+		timestamp += lastdec - now;
+	}
+	else {
+		/* we have an overflow ... */
+		timestamp += lastdec + timer_load_val - now;
+	}
+	lastdec = now;
+
+	return timestamp;
 }
 
 ulong get_timer(ulong base)
 {
-	return get_timer_masked() - base;
+    return get_timer_masked() - base;
 }
 
 void __udelay(unsigned long usec)
 {
-	unsigned long long tmp;
-	ulong tmo;
+    ulong tmo, tmp;
 
-	tmo = (usec + 9) / 10;
-	tmp = get_ticks() + tmo;	/* get current timestamp */
+    if (usec >= 1000) {     /* if "big" number, spread normalization to seconds */
+        tmo = usec / 1000;  /* start to normalize for usec to ticks per sec */
+        tmo *= CONFIG_SYS_HZ;      /* find number of "ticks" to wait to achieve target */
+        tmo /= 1000;        /* finish normalize. */
+    }
+    else {              /* else small number, don't kill it prior to HZ multiply */
+        tmo = usec * CONFIG_SYS_HZ;
+        tmo /= (1000 * 1000);
+    }
 
-	while (get_ticks() < tmp)/* loop till event */
-		 /*NOP*/;
+    tmp = get_timer(0);     /* get current timestamp */
+    if ((tmo + tmp + 1) < tmp)  /* if setting this fordward will roll time stamp */
+        reset_timer_masked();   /* reset "advancing" timestamp to 0, set lastdec value */
+    else
+        tmo += tmp;     /* else, set advancing stamp wake up time */
+
+    while (get_timer_masked()<tmo)  /* loop till event */
+         /*NOP*/;
 }
 
