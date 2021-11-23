@@ -107,6 +107,34 @@ static struct nand_ecclayout nand_oob_128 = {
 		 .length = 78} }
 };
 
+
+// samsung  K9GAG08U0D  MLC nand flash  oob size =218 Bytes
+// samsung  K9GAG08U0M  MLC nand flash  oob size =128 Bytes
+// MT       MT29F16G08ABACAWP  SLC nandflash oobsize =224 Bytes
+// MT       MT29F8G08ABABAWP   SLC nandflash oobsize =224 Bytes
+static struct nand_ecclayout s3c_nand_oob_mlc_128_8bit = {
+    .eccbytes = 104,
+    .eccpos = {
+        24,25,26,27,28,29,30,31,32,33,
+        34,35,36,37,38,39,40,41,42,43,
+        44,45,46,47,48,49,50,51,52,53,
+        54,55,56,57,58,59,60,61,62,63,
+        64,65,66,67,68,69,70,71,72,73,
+        74,75,76,77,78,79,80,81,82,83,
+        84,85,86,87,88,89,90,91,92,93,
+        94,95,96,97,98,99,100,101,102,103,
+        104,105,106,107,108,109,110,111,112,113,
+        114,115,116,117,118,119,120,121,122,123,
+        124,125,126,127},
+    .oobfree =
+      {
+        {.offset = 2,
+         .length = 22
+        }
+      }
+};
+
+
 static int nand_get_device(struct nand_chip *chip, struct mtd_info *mtd,
 			   int new_state);
 
@@ -2621,7 +2649,7 @@ static const struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 	*maf_id = chip->read_byte(mtd);
 	*dev_id = chip->read_byte(mtd);
 
-     printk(KERN_INFO " maf_id = 0x%x dev_id = 0x%x",*maf_id, *dev_id);
+   //  printk(KERN_INFO " maf_id = 0x%x dev_id = 0x%x \n",*maf_id, *dev_id);
 
 	/* Try again to make sure, as some systems the bus-hold or other
 	 * interface concerns can cause random data which looks like a
@@ -2672,12 +2700,9 @@ static const struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 	chip->chipsize = (uint64_t)type->chipsize << 20;
 
 	if (!type->pagesize && chip->init_size) {
-
-        printf(" go to here 1----\n ");
 		/* set the pagesize, oobsize, erasesize by the driver*/
 		busw = chip->init_size(mtd, chip, id_data);
 	} else if (!type->pagesize) {
-	    printf(" go to here 2----\n ");
 		int extid;
 		/* The 3rd id byte holds MLC / multichip data */
 		chip->cellinfo = id_data[2];
@@ -2737,20 +2762,9 @@ static const struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 		/*
 		 * Old devices have chip data hardcoded in the device id table
 		 */
-
-        printf(" go to here 3----\n ");
-
-        if(*maf_id==0x2c && dev_id==0x38)//MT29F8G08ABABAWP
-        {
-            mtd->oobsize = 128;
-        }
-        else
-        {
-            mtd->oobsize = mtd->writesize / 32;
-        }
-        
 		mtd->erasesize = type->erasesize;
 		mtd->writesize = type->pagesize;
+		mtd->oobsize = mtd->writesize / 32;
 		busw = type->options & NAND_BUSWIDTH_16;
 
 		/*
@@ -2766,11 +2780,9 @@ static const struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 			mtd->erasesize <<= ((id_data[3] & 0x03) << 1);
 		}
 	}
-
 #if 1 
         printf("NandFlash:name=%s,id=%x, pagesize=%d ,chipsize=%d MB,erasesize=%d oobsize=%d\n",type->name,type->id,type->pagesize,type->chipsize,type->erasesize,mtd->oobsize);
 #endif
-    
 	/* Get chip options, preserve non chip based options */
 	chip->options |= type->options;
 
@@ -2867,17 +2879,17 @@ ident_done:
 	/* Do not replace user supplied command function ! */
 	if (mtd->writesize > 512 && chip->cmdfunc == nand_command)
 		chip->cmdfunc = nand_command_lp;
-#if 0
+
 	/* TODO onfi flash name */
-	printk (KERN_INFO, "NAND device: Manufacturer ID:"\
-		" 0x%02x, Chip ID: 0x%02x (%s %s)\n", *maf_id, *dev_id,\
+	MTDDEBUG (MTD_DEBUG_LEVEL0, "NAND device: Manufacturer ID:"
+		" 0x%02x, Chip ID: 0x%02x (%s %s)\n", *maf_id, *dev_id,
 		nand_manuf_ids[maf_idx].name,
 #ifdef CONFIG_SYS_NAND_ONFI_DETECTION
 		chip->onfi_version ? chip->onfi_params.model : type->name);
 #else
 		type->name);
 #endif
-#endif
+
 	return type;
 }
 
@@ -2978,7 +2990,7 @@ int nand_scan_tail(struct mtd_info *mtd)
 			chip->ecc.layout = &nand_oob_64;
 			break;
 		case 128:
-			chip->ecc.layout = &nand_oob_128;
+			chip->ecc.layout = &s3c_nand_oob_mlc_128_8bit;
 			break;
 		default:
 			printk(KERN_WARNING "No oob scheme defined for "

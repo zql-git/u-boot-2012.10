@@ -102,7 +102,7 @@ int checkboard(void)
 #ifdef CONFIG_ENABLE_MMU
 ulong virt_to_phy_smdk6410(ulong addr)
 {
-	if ((0xc0000000 <= addr) && (addr < 0xc8000000))
+	if ((0xc0000000 <= addr) && (addr < 0xD0000000))
 		return addr - 0xc0000000 + 0x50000000;
 	else
 		printf("do not support this address : %08lx\n", addr);
@@ -123,6 +123,7 @@ ulong board_flash_get_legacy (ulong base, int banknum, flash_info_t *info)
 }
 
 #ifdef CONFIG_CMD_NET
+
 int board_eth_init(bd_t *bis)
 {
 	int rc = 0;
@@ -135,9 +136,11 @@ int board_eth_init(bd_t *bis)
 	return rc;
 }
 #endif
+
 #ifdef CONFIG_GENERIC_MMC
 int board_mmc_init(bd_t *bis)
 {
 	return s3c_mmc_init(0,4);
 }
 #endif
+

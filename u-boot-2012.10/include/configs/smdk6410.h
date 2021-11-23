@@ -88,9 +88,10 @@
 
 #define CONFIG_ETHADDR		08:08:10:12:10:27
 #define CONFIG_NETMASK		255.255.255.0
-#define CONFIG_IPADDR		192.168.1.190 
-#define CONFIG_SERVERIP		192.168.1.100
-#define CONFIG_GATEWAYIP	192.168.1.1
+#define CONFIG_IPADDR		192.168.50.165 
+#define CONFIG_SERVERIP		192.168.50.162
+#define CONFIG_GATEWAYIP	192.168.50.1
+
 #define CONFIG_MMC
 #define CONFIG_GENERIC_MMC
 #define CONFIG_CMD_MMC
@@ -157,7 +158,7 @@
 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_SDRAM_BASE	/* default load address	*/
 
-#define CONFIG_SYS_HZ			1562500
+#define CONFIG_SYS_HZ			1000
 
 /**********************************
  Support Clock Settings
@@ -240,6 +241,9 @@
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		0x70200010 
 #define CONFIG_SYS_S3C_NAND_HWECC
+#define CONFIG_NAND_BL1_8BIT_ECC
+
+
 
 #define CONFIG_SYS_NAND_SKIP_BAD_DOT_I	1  /* ".i" read skips bad blocks	      */
 #define CONFIG_SYS_NAND_WP		1
@@ -268,7 +272,7 @@
 /* Number of ECC bytes per OOB - S3C6410 calculates 4 bytes ECC in 1-bit mode */
 #define CONFIG_SYS_NAND_ECCBYTES	13
 /* Size of a single OOB region */
-#define CONFIG_SYS_NAND_OOBSIZE		224
+#define CONFIG_SYS_NAND_OOBSIZE		128
 /* ECC byte positions */
 #define CONFIG_SYS_NAND_ECCPOS	{24,25,26,27,28,29,30,31,32,33,\
         34,35,36,37,38,39,40,41,42,43,\
@@ -284,8 +288,8 @@
 
 /* Boot configuration (define only one of next 3) */
 /*----------------------------------------------------------------------------*/
-/*#define CONFIG_BOOT_NAND*/
-#define CONFIG_BOOT_MOVINAND
+#define CONFIG_BOOT_NAND
+//#define CONFIG_BOOT_MOVINAND
 /*----------------------------------------------------------------------------*/
 
 
@@ -320,9 +324,9 @@
 #define CONFIG_SYS_USB_OHCI_MAX_ROOT_PORTS	3
 #define CONFIG_SYS_USB_OHCI_CPU_INIT		1
 
-#define CONFIG_USB_STORAGE	1
+#define CONFIG_USB_STORAGE	                1
 #endif
-#define CONFIG_DOS_PARTITION	1
+#define CONFIG_DOS_PARTITION	            1
 
 #if defined(CONFIG_USB_OHCI_NEW) && defined(CONFIG_ENABLE_MMU)
 # error "usb_ohci.c is currently broken with MMU enabled."
