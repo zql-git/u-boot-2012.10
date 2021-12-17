@@ -29,10 +29,8 @@
  * as they seem to have the same PLL and clock machinery inside.
 
  */
-
 #include <common.h>
 #include <asm/arch/s3c6410.h>
-
 #define APLL 0
 #define MPLL 1
 #define EPLL 2
@@ -136,9 +134,8 @@ int print_cpuinfo(void)
 	printf("****************************************\r\n");
 	printf("**    u-boot 2012.10                  **\r\n");
 	printf("**    Updated for OK6410A Board       **\r\n");
-	printf("**    Version (2021-10-23)            **\r\n");
-	printf("**      ~(o^o)~  ~(o^o)~              **\r\n");	
-	printf("**    wenson study uboot              **\r\n");
+	printf("**    Version (2021-12-17)            **\r\n");
+	printf("**    278869884@qq.com                **\r\n");
 	printf("****************************************\r\n");
 	printf("\nCPU:     S3C6410@%luMHz\n", get_ARMCLK() / 1000000);
 	printf("         Fclk = %luMHz, Hclk = %luMHz, Pclk = %luMHz ",

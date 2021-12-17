@@ -52,7 +52,7 @@
 #define CONFIG_SYS_SDRAM_BASE	0x50000000
 
 /* input clock of PLL: SMDK6410 has 12MHz input clock */
-#define CONFIG_SYS_CLK_FREQ	12000000
+#define CONFIG_SYS_CLK_FREQ         12000000
 
 #if !defined(CONFIG_NAND_SPL) && (CONFIG_SYS_TEXT_BASE >= 0xc0000000)
 #define CONFIG_ENABLE_MMU
@@ -65,7 +65,7 @@
 /*
  * Architecture magic and machine type
  */
-#define CONFIG_MACH_TYPE		1626
+#define CONFIG_MACH_TYPE        1626
 
 #define CONFIG_DISPLAY_CPUINFO
 #define CONFIG_DISPLAY_BOARDINFO
@@ -73,21 +73,20 @@
 /*
  * Size of malloc() pool
  */
-
-
+ 
 /*
  * Hardware drivers
  */
 #define CONFIG_DRIVER_DM9000
-#define CONFIG_DM9000_BASE		0x18000300
-#define DM9000_IO		CONFIG_DM9000_BASE
-#define DM9000_DATA		(CONFIG_DM9000_BASE+0x4)
+#define CONFIG_DM9000_BASE      0x18000300
+#define DM9000_IO               CONFIG_DM9000_BASE
+#define DM9000_DATA             (CONFIG_DM9000_BASE+0x4)
 
-#define CONFIG_ETHADDR		08:08:10:12:10:27
-#define CONFIG_NETMASK		255.255.255.0
-#define CONFIG_IPADDR		192.168.50.165 
-#define CONFIG_SERVERIP		192.168.50.162
-#define CONFIG_GATEWAYIP	192.168.50.1
+#define CONFIG_ETHADDR          08:08:10:12:10:27
+#define CONFIG_NETMASK          255.255.255.0
+#define CONFIG_IPADDR           192.168.50.165 
+#define CONFIG_SERVERIP         192.168.50.162
+#define CONFIG_GATEWAYIP        192.168.50.1
 
 #define CONFIG_MMC
 #define CONFIG_GENERIC_MMC
@@ -236,14 +235,12 @@
 
 #define CONFIG_CMD_NAND_LOCK_UNLOCK
 
-#if 0
 #define CONFIG_CMD_NAND_YAFFS       1
-#define WITH_INLINE_OOB             0
 
-#endif
 #define CONFIG_SYS_NAND_SKIP_BAD_DOT_I	1  /* ".i" read skips bad blocks	      */
 #define CONFIG_SYS_NAND_WP		1
 #define CONFIG_SYS_NAND_YAFFS_WRITE	1  /* support yaffs write		      */
+
 #define CONFIG_SYS_NAND_BBT_2NDPAGE	1  /* bad-block markers in 1st and 2nd pages  */
 
 #define CONFIG_SYS_NAND_U_BOOT_DST	CONFIG_SYS_PHY_UBOOT_BASE	/* NUB load-addr      */
@@ -284,8 +281,8 @@
 
 /* Boot configuration (define only one of next 3) */
 /*----------------------------------------------------------------------------*/
-#define CONFIG_BOOT_NAND
-//#define CONFIG_BOOT_MOVINAND
+//#define CONFIG_BOOT_NAND
+#define CONFIG_BOOT_MOVINAND
 /*----------------------------------------------------------------------------*/
 
 
@@ -312,7 +309,6 @@
 #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 512 * 1024)
 #define CONFIG_ENV_SIZE		    0x80000	    /* Total Size of Environment Sector */ //512K Bytes
 #define CONFIG_ENV_OFFSET		0x100000    /* 1M */
-
 #endif
 /* Unimplemented or unsupported. See comment above.
 #define CONFIG_ONENAND

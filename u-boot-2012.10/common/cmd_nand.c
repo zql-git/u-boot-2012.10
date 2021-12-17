@@ -684,14 +684,12 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
                 ret = nand_write(nand, off, &rwsize, (u_char *)addr);
                 
 #ifdef CONFIG_CMD_NAND_YAFFS
-		} else if (!strcmp(s, ".yaffs")) {
+		} else if (!strcmp(s, ".yaffs2")) {
 			if (read) {
 				printf("Unknown nand command suffix '%s'.\n", s);
 				return 1;
 			}
-			ret = nand_write_skip_bad(nand, off, &rwsize,
-						(u_char *)addr,
-						WITH_INLINE_OOB);
+			ret = nand_write_skip_bad(nand, off, &rwsize,(u_char *)addr,WITH_YAFFS_OOB);
 #endif
 		} else if (!strcmp(s, ".oob")) {
 			/* out-of-band data */
