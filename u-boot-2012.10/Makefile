@@ -166,7 +166,7 @@ export	ARCH CPU BOARD VENDOR SOC
 ifeq ($(HOSTARCH),$(ARCH))
 CROSS_COMPILE ?=
 endif
-CROSS_COMPILE = arm-linux-
+#CROSS_COMPILE = arm-linux-
 # load other configuration
 include $(TOPDIR)/config.mk
 
@@ -749,9 +749,9 @@ smdk6410_config	:	unconfig
 	@echo "#define CONFIG_NAND_U_BOOT" > $(obj)include/config.h
 	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk
 	@if [ -z "$(findstring smdk6410_noUSB_config,$@)" ]; then			\
-		echo "RAM_TEXT = 0x57e00000" >> $(obj)board/samsung/smdk6410/config.tmp;\
+		echo "RAM_TEXT = 0x5fe00000" >> $(obj)board/samsung/smdk6410/config.tmp;\
 	else										\
-		echo "RAM_TEXT = 0xc7e00000" >> $(obj)board/samsung/smdk6410/config.tmp;\
+		echo "RAM_TEXT = 0xcfe00000" >> $(obj)board/samsung/smdk6410/config.tmp;\
 	fi
 	@$(MKCONFIG) smdk6410 arm arm1176 smdk6410 samsung s3c64xx
 	@echo "CONFIG_NAND_U_BOOT = y" >> $(obj)include/config.mk

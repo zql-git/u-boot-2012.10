@@ -59,7 +59,7 @@ lowlevel_init:
 	ldr	r1, =0x00005555
 	str	r1, [r0, #GPMPUD_OFFSET]
 
-	ldr	r1, =0x000A
+	ldr	r1, =0x000e
 	str	r1, [r0, #GPMDAT_OFFSET]
 
 	/* Disable Watchdog */
@@ -94,15 +94,17 @@ lowlevel_init:
 	/* init system clock */
 	bl system_clock_init
 
-#ifndef CONFIG_NAND_SPL
+
 	/* for UART */
 	bl uart_asm_init
-#endif
 
-//#ifdef CONFIG_BOOT_NAND
+	mov r0, #0x39  @'+'
+	bl    asm_putc
+
+#ifdef CONFIG_NAND
 	/* simple init for NAND */
 	bl nand_asm_init
-//#endif
+#endif
 
 	/* Memory subsystem address 0x7e00f120 */
 	ldr	r0, =ELFIN_MEM_SYS_CFG
@@ -242,16 +244,12 @@ wait_for_async:
 	ldr	r1, [r0, #OTHERS_OFFSET]
 	orr	r1, r1, #0x20
 	str	r1, [r0, #OTHERS_OFFSET]
-#elif !defined(CONFIG_S3C6410)
-	/* According to 661558um_S3C6410X_rev10.pdf 0x20 is reserved */
+#else
 	ldr	r1, [r0, #OTHERS_OFFSET]
 	bic	r1, r1, #0x20
 	str	r1, [r0, #OTHERS_OFFSET]
 #endif
 	mov	pc, lr
-
-
-#ifndef CONFIG_NAND_SPL
 /*
  * uart_asm_init: Initialize UART's pins
  */
@@ -260,10 +258,86 @@ uart_asm_init:
 	ldr	r0, =ELFIN_GPIO_BASE
 	ldr	r1, =0x220022
 	str	r1, [r0, #GPACON_OFFSET]
-	mov	pc, lr
-#endif
+	ldr	r1, =0x2222
+	str   	r1, [r0, #GPBCON_OFFSET]
 
-//#ifdef CONFIG_BOOT_NAND
+	ldr	r0, =ELFIN_UART_CONSOLE_BASE		@0x7F005000
+	mov	r1, #0x0
+	str	r1, [r0, # UFCON_OFFSET]
+	str	r1, [r0, #UMCON_OFFSET]
+	mov	r1, #0x3                	@was 0.
+	str	r1, [r0, #ULCON_OFFSET]
+
+	ldr	r1, [r0, #PCLK_GATE_OFFSET]  
+	orr	r1, r1, #0x02    /* Gate  for PCLK_UART0*/
+	str   r1, [r0, #PCLK_GATE_OFFSET] 
+	ldr	r1, =0xA45			/* UARTCLK SRC = x0 => PCLK */
+	str	r1, [r0, #UCON_OFFSET]
+
+    ldr	r1, =0x22
+    str	r1, [r0, #UBRDIV_OFFSET]
+    
+	ldr	r1, =0x1FFF
+	str	r1, [r0, #UDIVSLOT_OFFSET]
+	mov	pc, lr
+
+#if 1
+    .globl asm_putc
+
+asm_putc:
+	ldr	r1, =ELFIN_UART_BASE
+1:	ldr   r2, [r1, #UTRSTAT_OFFSET]
+	tst   r2, #2
+	beq  1b
+	str	r0, [r1, #UTXH_OFFSET]
+	mov	pc, lr
+	
+	.globl asm_puts
+asm_puts:
+	stmfd	sp!, {r1-r3, lr}
+	mov 	r3, r0
+0:	ldrb 		r0, [r3]
+	cmp 	r0,#0
+	beq	2f
+	cmp 	r0, # '\n'
+	bne 1f
+	mov 	r0, # '\r'
+	bl asm_putc
+	mov 	r0, # '\n'
+1:
+	bl asm_putc
+	add  	r3, r3, #1
+	b   0b
+2:
+	ldmfd	sp!, {r1-r3, lr}	
+	mov 	pc, lr
+
+	.globl asm_print_hex
+asm_print_hex:
+	stmfd	sp!, {r1-r4, lr}
+	/* mov r5,lr */
+	mov r3,r0
+
+	mov r0,#'0'
+	bl    asm_putc
+	mov r0,#'x'
+	bl    asm_putc
+
+	mov r4,#8
+1:	mov r3,r3, ror #28
+	and r0, r3,#0x0F
+	cmp r0,#9
+	addls r0,r0,#'0'
+	addhi r0,r0,#55
+	bl    asm_putc
+	subs r4, r4,#1
+	bne 1b
+	/* mov lr,r5 */
+	ldmfd	sp!, {r1-r4, lr}	
+	mov pc,lr
+#endif	
+
+#ifdef CONFIG_NAND
 /*
  * NAND Interface init for SMDK6410
  */
@@ -279,7 +353,7 @@ nand_asm_init:
 	str	r1, [r0, #NFCONT_OFFSET]
 
 	mov	pc, lr
-//#endif
+#endif
 
 #ifdef CONFIG_ENABLE_MMU
 /*

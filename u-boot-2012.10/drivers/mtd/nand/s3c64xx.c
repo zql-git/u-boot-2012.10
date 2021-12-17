@@ -128,23 +128,23 @@ static int s3c_nand_device_ready(struct mtd_info *mtdinfo)
   * jsgood: Temporary 8 Bit H/W ECC supports for BL1 (6410/6430 only)
   ***************************************************************/
  int cur_ecc_mode=0;
-    /*
-     * Function for checking ECCEncDone in NFSTAT
-     * Written by jsgood
-     */
-    static void s3c_nand_wait_enc(void)
-    {
-        while (!(readl(NFSTAT) & NFSTAT_ECCENCDONE)) {}
-    }
-    
-    /*
-     * Function for checking ECCDecDone in NFSTAT
-     * Written by jsgood
-     */
-    static void s3c_nand_wait_dec(void)
-    {
-        while (!(readl(NFSTAT) & NFSTAT_ECCDECDONE)) {}
-    }
+/*
+ * Function for checking ECCEncDone in NFSTAT
+ * Written by jsgood
+ */
+static void s3c_nand_wait_enc(void)
+{
+    while (!(readl(NFSTAT) & NFSTAT_ECCENCDONE)) {}
+}
+
+/*
+ * Function for checking ECCDecDone in NFSTAT
+ * Written by jsgood
+ */
+static void s3c_nand_wait_dec(void)
+{
+    while (!(readl(NFSTAT) & NFSTAT_ECCDECDONE)) {}
+}
   
  static void s3c_nand_wait_ecc_busy_8bit(void)
  {
@@ -302,12 +302,11 @@ void s3c_nand_write_page_8bit(struct mtd_info *mtd, struct nand_chip *chip,
 int s3c_nand_read_page_8bit(struct mtd_info *mtd, struct nand_chip *chip,
                             uint8_t *buf)
 {
-    int i, stat, eccsize = 512;
+    int i,stat, eccsize = 512;
     int eccbytes = 13;
     int eccsteps = mtd->writesize / eccsize;
     int col = 0;
     uint8_t *p = buf;
-
     /* Step1: read whole oob */
     col = mtd->writesize;
     chip->cmdfunc(mtd, NAND_CMD_RNDOUT, col, -1);
@@ -321,7 +320,6 @@ int s3c_nand_read_page_8bit(struct mtd_info *mtd, struct nand_chip *chip,
         chip->write_buf(mtd, chip->oob_poi + 24 + (((mtd->writesize / eccsize) - eccsteps) * eccbytes), eccbytes);
         s3c_nand_calculate_ecc_8bit(mtd, 0, 0);
         stat = s3c_nand_correct_data_8bit(mtd, p, 0, 0);
-
         if (stat == -1)
             mtd->ecc_stats.failed++;
 
@@ -476,9 +474,9 @@ int board_nand_init(struct nand_chip *nand)
 	nand->IO_ADDR_R		= (void __iomem *)NFDATA;
 	nand->IO_ADDR_W		= (void __iomem *)NFDATA;
 	nand->cmd_ctrl		= s3c_nand_hwcontrol;
-	nand->dev_ready		= s3c_nand_device_ready;
+	nand->dev_ready		= s3c_nand_device_ready;    
 	nand->select_chip	= s3c_nand_select_chip;
-	nand->options		= 0;
+	nand->options		= NAND_SKIP_BBTSCAN;
 #ifdef CONFIG_NAND_SPL
 	nand->read_byte		= nand_read_byte;
 	nand->write_buf		= nand_write_buf;
@@ -489,6 +487,7 @@ int board_nand_init(struct nand_chip *nand)
 
 #ifdef CONFIG_NAND_BL1_8BIT_ECC
         printf("USE HWECC 8BIT\n");
+        nand->ecc.mode		    = NAND_ECC_HW;
         nand->ecc.hwctl         = s3c_nand_enable_hwecc_8bit;
         nand->ecc.calculate     = s3c_nand_calculate_ecc_8bit;
         nand->ecc.correct       = s3c_nand_correct_data_8bit;

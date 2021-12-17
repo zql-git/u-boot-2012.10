@@ -188,14 +188,13 @@ static int nand_load(struct mtd_info *mtd, unsigned int offs,
  * configured and available since this code loads the main U-Boot image
  * from NAND into SDRAM and starts it from there.
  */
-#include <asm/arch/s3c6410.h>
 void nand_boot(void)
 {
 	struct nand_chip nand_chip;
 	nand_info_t nand_info;
     
 	__attribute__((noreturn)) void (*uboot)(void);
-
+    
 	/*
 	 * Init board specific nand support
 	 */
@@ -204,9 +203,7 @@ void nand_boot(void)
 	nand_chip.IO_ADDR_R = nand_chip.IO_ADDR_W = (void  __iomem *)CONFIG_SYS_NAND_BASE;
 	nand_chip.dev_ready = NULL;	/* preset to NULL */
 	nand_chip.options = 0;
-    GPMDAT_REG = 0x0005;
 	board_nand_init(&nand_chip);
-    GPMDAT_REG = 0x000e;
     
 	if (nand_chip.select_chip)
 		nand_chip.select_chip(&nand_info, 0);

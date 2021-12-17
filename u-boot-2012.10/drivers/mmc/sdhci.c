@@ -83,7 +83,7 @@ static int sdhci_transfer_data(struct sdhci_host *host, struct mmc_data *data,
 {
 	unsigned int stat, rdy, mask, timeout, block = 0;
 
-	timeout = 10000;
+	timeout = 100000;
 	rdy = SDHCI_INT_SPACE_AVAIL | SDHCI_INT_DATA_AVAIL;
 	mask = SDHCI_DATA_AVAILABLE | SDHCI_SPACE_AVAILABLE;
 	do {
@@ -109,12 +109,14 @@ static int sdhci_transfer_data(struct sdhci_host *host, struct mmc_data *data,
 			sdhci_writel(host, start_addr, SDHCI_DMA_ADDRESS);
 		}
 #endif
+#if 0
 		if (timeout-- > 0)
 			udelay(10);
 		else {
 			printf("Transfer data timeout\n");
 			return -1;
 		}
+        #endif
 	} while (!(stat & SDHCI_INT_DATA_END));
 	return 0;
 }

@@ -73,14 +73,11 @@
 /*
  * Size of malloc() pool
  */
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 1024 * 1024)
+
 
 /*
  * Hardware drivers
  */
-//define CONFIG_CS8900			/* we have a CS8900 on-board	*/
-//#define CONFIG_CS8900_BASE	  	0x18800300
-//#define CONFIG_CS8900_BUS16		/* follow the Linux driver	*/
 #define CONFIG_DRIVER_DM9000
 #define CONFIG_DM9000_BASE		0x18000300
 #define DM9000_IO		CONFIG_DM9000_BASE
@@ -185,7 +182,7 @@
 #define PHYS_SDRAM_1_SIZE	0x10000000	/* 256 MB in Bank #1	*/
 
 #define CONFIG_SYS_FLASH_BASE		0x10000000
-#define CONFIG_SYS_MONITOR_BASE	0x00000000
+#define CONFIG_SYS_MONITOR_BASE		0x00000000
 
 /*-----------------------------------------------------------------------
  * FLASH and environment organization
@@ -206,7 +203,6 @@
 #define CONFIG_SYS_FLASH_ERASE_TOUT	(5 * CONFIG_SYS_HZ) /* Timeout for Flash Erase	*/
 #define CONFIG_SYS_FLASH_WRITE_TOUT	(5 * CONFIG_SYS_HZ) /* Timeout for Flash Write	*/
 
-#define CONFIG_ENV_SIZE		0x4000	/* Total Size of Environment Sector */
 
 /*
  * SMDK6410 board specific data
@@ -215,7 +211,7 @@
 #define CONFIG_IDENT_STRING	" for SMDK6410"
 
 /* base address for uboot */
-#define CONFIG_SYS_PHY_UBOOT_BASE	(CONFIG_SYS_SDRAM_BASE + 0x07e00000)
+#define CONFIG_SYS_PHY_UBOOT_BASE	(CONFIG_SYS_SDRAM_BASE + 0x0fe00000)
 /* total memory available to uboot */
 #define CONFIG_SYS_UBOOT_SIZE		(1024 * 1024)
 
@@ -224,18 +220,12 @@
 
 #ifdef CONFIG_ENABLE_MMU
 #define CONFIG_SYS_MAPPED_RAM_BASE	0xc0000000
-#define CONFIG_BOOTCOMMAND	"nand read 0xc0018000 0x60000 0x1c0000;" \
-				"bootm 0xc0018000"
 #else
 #define CONFIG_SYS_MAPPED_RAM_BASE	CONFIG_SYS_SDRAM_BASE
-#define CONFIG_BOOTCOMMAND	"nand read 0x50018000 0x60000 0x1c0000;" \
-				"bootm 0x50018000"
 #endif
 
 /* NAND U-Boot load and start address */
-#define CONFIG_SYS_UBOOT_BASE		(CONFIG_SYS_MAPPED_RAM_BASE + 0x07e00000)
-
-#define CONFIG_ENV_OFFSET		0x0080000
+#define CONFIG_SYS_UBOOT_BASE		(CONFIG_SYS_MAPPED_RAM_BASE + 0x0fe00000)
 
 /* NAND configuration */
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
@@ -244,7 +234,13 @@
 #define CONFIG_NAND_BL1_8BIT_ECC
 
 
+#define CONFIG_CMD_NAND_LOCK_UNLOCK
 
+#if 0
+#define CONFIG_CMD_NAND_YAFFS       1
+#define WITH_INLINE_OOB             0
+
+#endif
 #define CONFIG_SYS_NAND_SKIP_BAD_DOT_I	1  /* ".i" read skips bad blocks	      */
 #define CONFIG_SYS_NAND_WP		1
 #define CONFIG_SYS_NAND_YAFFS_WRITE	1  /* support yaffs write		      */
@@ -254,14 +250,14 @@
 #define CONFIG_SYS_NAND_U_BOOT_START	CONFIG_SYS_NAND_U_BOOT_DST	/* NUB start-addr     */
 
 #define CONFIG_SYS_NAND_U_BOOT_OFFS	(16 * 1024)	/* Offset to RAM U-Boot image */
-#define CONFIG_SYS_NAND_U_BOOT_SIZE	(512 * 1024)	/* Size of RAM U-Boot image   */
+#define CONFIG_SYS_NAND_U_BOOT_SIZE	(2 * 1024 * 1024)	/* Size of RAM U-Boot image   */
 
 /* NAND chip page size		*/
 #define CONFIG_SYS_NAND_PAGE_SIZE	4096//2048
 /* NAND chip block size		*/
-#define CONFIG_SYS_NAND_BLOCK_SIZE	(512 * 1024)  /* 一个block 512K*/
+#define CONFIG_SYS_NAND_BLOCK_SIZE	(512 * 1024)  /* one block 512K*/
 /* NAND chip page per block count  */
-#define CONFIG_SYS_NAND_PAGE_COUNT	(128)          /*每个 block 有128个 page*/
+#define CONFIG_SYS_NAND_PAGE_COUNT	(128)          /*  one block  has 128 pages */
 /* Location of the bad-block label */
 #define CONFIG_SYS_NAND_BAD_BLOCK_POS	0
 /* Extra address cycle for > 128MiB */
@@ -305,6 +301,18 @@
 
 #ifdef	CONFIG_BOOT_MOVINAND
 #define CONFIG_MOVINAND
+#define CONFIG_BOOTCOMMAND "fatload mmc 0:1 50008000 u-boot-nand.bin; nand erase.chip;nand write.uboot 50008000 0 0x200000;fatload mmc 0:1 0x50008000 zImage;nand write.e 0x50008000 0x500000 0x500000;fatload mmc 0:1 0x50008000 rootfs.yaffs2; nand write.yaffs2 0x50008000 0x01e00000 $filesize;"
+
+#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 1024*1024)
+#define CONFIG_ENV_SIZE		    0x4000	/* Total Size of Environment Sector 16K*/
+#define CONFIG_ENV_OFFSET		0x00047000  /* 284K */
+
+#else
+#define CONFIG_BOOTCOMMAND "nand read 0x50018000 0x500000 0x400000;bootm 0x50018000"
+#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 512 * 1024)
+#define CONFIG_ENV_SIZE		    0x80000	    /* Total Size of Environment Sector */ //512K Bytes
+#define CONFIG_ENV_OFFSET		0x100000    /* 1M */
+
 #endif
 /* Unimplemented or unsupported. See comment above.
 #define CONFIG_ONENAND
@@ -313,9 +321,9 @@
 
 /* Settings as above boot configuration */
 #define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_BOOTARGS		"console=ttySAC,115200"
+#define CONFIG_BOOTARGS		"root=/dev/mtdblock2 rootfstype=yaffs2 init=/linuxrc console=ttySAC0,115200"
 
-#if !defined(CONFIG_ENABLE_MMU)
+#if 0//!defined(CONFIG_ENABLE_MMU)
 #define CONFIG_CMD_USB			1
 #define CONFIG_USB_S3C64XX
 #define CONFIG_USB_OHCI_NEW		1
